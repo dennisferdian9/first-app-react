@@ -1,5 +1,3 @@
-"use client";
-
 import { useParams } from "next/navigation";
 export default function About() {
   const params = useParams();
@@ -8,7 +6,7 @@ export default function About() {
       this is Product Page
       Dennis Ferdian
       <p>      
-        slug: {params.slug}
+        slug: {params?.slug}
       </p>
     </main>
   )

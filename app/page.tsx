@@ -3,9 +3,13 @@ import { ChangeEvent, useCallback, useEffect, useState } from "react"
 import { ListContainer } from '@/components/ListContainer'
 import { pokemonModel } from "@/types/pokemon";
 import { getPokemonData } from "@/utils/GetPokemonData";
-
+import type { RootState } from "@/GlobalRedux/store"
+import { useSelector } from "react-redux"
+import { DetailModal } from "./components/DetailModal";
 
 export default function Home() {
+
+  const pokemonDetail = useSelector((state: RootState) => state.pokemon)
 
   const [pokemonList, setPokemonList] = useState<pokemonModel[]>([])
   const [text, setText] = useState<string>("")
@@ -14,8 +18,6 @@ export default function Home() {
   const [urlFetch, setUrlFetch] = useState<string>('')
 
   const fetchPokemon = useCallback(async() => {
-    console.log('test fetcj');
-
     let url = urlFetch.length ? urlFetch :'https://pokeapi.co/api/v2/pokemon'
     const pokemonListAPIData = await  getPokemonData(url)
     setPokemonList(pokemonListAPIData.results)
@@ -45,6 +47,8 @@ export default function Home() {
 
   return (
     <main>
+      {pokemonDetail.id > 0 && <DetailModal detail={pokemonDetail}/> }
+
       <ListContainer list={pokemonList}/>
       <div className="flex gap-x-2 mt-2">
         <button onClick={() => nextButtonHandler('prev')} type="button" className={"rounded px-2 py-1 " + (prevURL ? "bg-white text-black" : "bg-transparent text-gray-300 cursor-not-allowed")}>Prev Page</button>
