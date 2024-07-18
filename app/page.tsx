@@ -1,95 +1,56 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+import { ChangeEvent, useCallback, useEffect, useState } from "react"
+import { ListContainer } from '@/components/ListContainer'
+import { pokemonModel } from "@/types/pokemon";
+import { getPokemonData } from "@/utils/GetPokemonData";
+
 
 export default function Home() {
+
+  const [pokemonList, setPokemonList] = useState<pokemonModel[]>([])
+  const [text, setText] = useState<string>("")
+  const [nextURL, setNextURL] = useState<string | null>(null)
+  const [prevURL, setprevURL] = useState<string | null>(null)
+  const [urlFetch, setUrlFetch] = useState<string>('')
+
+  const fetchPokemon = useCallback(async() => {
+    console.log('test fetcj');
+
+    let url = urlFetch.length ? urlFetch :'https://pokeapi.co/api/v2/pokemon'
+    const pokemonListAPIData = await  getPokemonData(url)
+    setPokemonList(pokemonListAPIData.results)
+    setNextURL(pokemonListAPIData.next)
+    setprevURL(pokemonListAPIData.prev)
+  },[urlFetch])
+
+
+  useEffect( () => {    
+    fetchPokemon()
+  }, [fetchPokemon])
+
+  const inputTitleHandler = (event:ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault()
+    setText(event.target.value)
+  }
+
+  const nextButtonHandler = (value: string) => {
+    let url = 'https://pokeapi.co/api/v2/pokemon'
+    if ( value === 'next') 
+      url = nextURL ?? url
+    else if (  value === 'prev') 
+      url = prevURL  ?? url  
+   
+    setUrlFetch(url)
+  }
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+    <main>
+      <ListContainer list={pokemonList}/>
+      <div className="flex gap-x-2 mt-2">
+        <button onClick={() => nextButtonHandler('prev')} type="button" className={"rounded px-2 py-1 " + (prevURL ? "bg-white text-black" : "bg-transparent text-gray-300 cursor-not-allowed")}>Prev Page</button>
+        <button onClick={() => nextButtonHandler('next')} type="button" className={"rounded px-2 py-1 " + (nextURL ? "bg-white  text-black" : "bg-transparent text-gray-300 cursor-not-allowed")}>Next Page</button>
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+     <input className="mt-2" value={text} onChange={inputTitleHandler} type="text"/>
     </main>
   )
 }
