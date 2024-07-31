@@ -4,8 +4,9 @@ import { ListContainer } from '@/components/ListContainer'
 import { pokemonModel } from "@/types/pokemon";
 import { getPokemonData } from "@/utils/GetPokemonData";
 import type { RootState } from "@/GlobalRedux/store"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { DetailModal } from "./components/DetailModal";
+import { resetPokemonDetail } from "./GlobalRedux/Features/pokemon/pokemonSlice";
 
 export default function Home() {
 
@@ -17,7 +18,11 @@ export default function Home() {
   const [prevURL, setprevURL] = useState<string | null>(null)
   const [urlFetch, setUrlFetch] = useState<string>('')
 
+  const dispatch = useDispatch() 
+
   const fetchPokemon = useCallback(async() => {
+    dispatch(resetPokemonDetail())
+
     let url = urlFetch.length ? urlFetch :'https://pokeapi.co/api/v2/pokemon'
     const pokemonListAPIData = await  getPokemonData(url)
     setPokemonList(pokemonListAPIData.results)
@@ -35,13 +40,12 @@ export default function Home() {
     setText(event.target.value)
   }
 
-  const nextButtonHandler = (value: string) => {
+  const nextButtonHandler = (value: string = "prev") => {
     let url = 'https://pokeapi.co/api/v2/pokemon'
     if ( value === 'next') 
       url = nextURL ?? url
-    else if (  value === 'prev') 
+    else (  value === 'prev') 
       url = prevURL  ?? url  
-   
     setUrlFetch(url)
   }
 
@@ -51,10 +55,16 @@ export default function Home() {
 
       <ListContainer list={pokemonList}/>
       <div className="flex gap-x-2 mt-2">
-        <button onClick={() => nextButtonHandler('prev')} type="button" className={"rounded px-2 py-1 " + (prevURL ? "bg-white text-black" : "bg-transparent text-gray-300 cursor-not-allowed")}>Prev Page</button>
-        <button onClick={() => nextButtonHandler('next')} type="button" className={"rounded px-2 py-1 " + (nextURL ? "bg-white  text-black" : "bg-transparent text-gray-300 cursor-not-allowed")}>Next Page</button>
+        <button data-testid="prev-button" onClick={() => nextButtonHandler('prev')} type="button" className={"rounded px-2 py-1 " + (prevURL ? "bg-white text-black" : "bg-transparent text-gray-300 cursor-not-allowed")}>Prev Page</button>
+        <button data-testid="next-button" onClick={() => nextButtonHandler('next')} type="button" className={"rounded px-2 py-1 " + (nextURL ? "bg-white  text-black" : "bg-transparent text-gray-300 cursor-not-allowed")}>Next Page</button>
       </div>
-     <input className="mt-2" value={text} onChange={inputTitleHandler} type="text"/>
+     <input         
+      data-testid="input-field"
+      className="mt-2" 
+      value={text} 
+      onChange={inputTitleHandler} 
+      type="text"
+      />
     </main>
   )
 }

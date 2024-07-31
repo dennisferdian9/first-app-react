@@ -16,7 +16,7 @@ export const ListCard: React.FC<listContainerProps> = ({pokemon}) => {
   }
   
   return (
-    <div onClick={cardClickHandler} className="border bg-white px-2 py-1">
+    <div data-testid="list-card-container" onClick={cardClickHandler} className="border bg-white px-2 py-1">
       <h2>{pokemon.name}</h2>
       <Image src={pokemon.image} alt={pokemon.name} width={200} height={400}/>
     </div>

@@ -1,13 +1,23 @@
 "use client";
 
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import pokemonReducer from './Features/pokemon/pokemonSlice';
 
-export const store = configureStore({
-  reducer: {
-    pokemon: pokemonReducer
-  }
+export type RootState = ReturnType<typeof rootReducer>
+export type AppDispatch = typeof setupStore
+
+
+const rootReducer = combineReducers({
+  pokemon: pokemonReducer
 })
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+export const setupStore = (preloadedState?: Partial<RootState>) => {
+  return configureStore({
+    reducer: rootReducer,
+    preloadedState
+  })
+}
+
+  export type AppStore = ReturnType<typeof setupStore>
+
+
